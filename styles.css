@@ -28,7 +28,7 @@ body {
   font-family: "Google Sans Code", "Noto Emoji", monospace;
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
