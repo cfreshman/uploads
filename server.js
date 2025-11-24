@@ -87,8 +87,15 @@ function saveUploads() {
 
 function generateId(filename) {
   const ext = path.extname(filename);
-  const random = crypto.randomBytes(8).toString('hex');
-  return random + ext;
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let id;
+  do {
+    id = '';
+    for (let i = 0; i < 8; i++) {
+      id += chars[Math.floor(Math.random() * chars.length)];
+    }
+  } while (uploads[id + ext]);
+  return id + ext;
 }
 
 function serveFile(filePath, contentType, res) {
@@ -275,18 +282,12 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  // API: Download file (PUBLIC - no auth required)
-  if (url.pathname.startsWith('/api/download/') && req.method === 'GET') {
-    const id = url.pathname.split('/')[3];
-    const upload = uploads[id];
+  // Serve uploaded files at root path (public) - must be last to not conflict with other routes
+  const potentialId = url.pathname.slice(1);
+  if (potentialId && uploads[potentialId] && req.method === 'GET') {
+    const upload = uploads[potentialId];
+    const filePath = path.join(FILES_DIR, potentialId);
     
-    if (!upload) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('File not found');
-      return;
-    }
-    
-    const filePath = path.join(FILES_DIR, id);
     if (!fs.existsSync(filePath)) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('File not found');

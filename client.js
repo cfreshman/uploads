@@ -137,11 +137,12 @@ form.addEventListener('submit', async (e) => {
     }
     
     const data = await res.json();
-    const downloadUrl = window.location.origin + '/api/download/' + data.id;
+    const downloadUrl = window.location.origin + '/' + data.id;
     resultUrl.textContent = downloadUrl;
     result.classList.add('show');
     
     form.reset();
+    fileLabel.textContent = 'choose file';
     loadUploads();
   } catch (err) {
     error.textContent = 'Network error';
@@ -173,7 +174,7 @@ async function deleteUpload(id) {
 }
 
 function copyLink(id) {
-  const url = window.location.origin + '/api/download/' + id;
+  const url = window.location.origin + '/' + id;
   navigator.clipboard.writeText(url);
   
   // Visual feedback
