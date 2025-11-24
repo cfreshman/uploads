@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>uploads</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>uploads</h1>
+    <p class="subtitle">file archive</p>
+    
+    <form id="uploadForm">
+      <div class="form-group">
+        <label for="file">file</label>
+        <input 
+          type="file" 
+          id="file" 
+          required
+        >
+        <div class="error" id="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">description (optional)</label>
+        <input 
+          type="text" 
+          id="description" 
+          placeholder="what is this file?"
+        >
+      </div>
+      
+      <div class="button-group">
+        <button type="submit">upload</button>
+        <button type="button" class="secondary" onclick="document.getElementById('uploadForm').reset(); document.getElementById('result').classList.remove('show')">clear</button>
+      </div>
+    </form>
+    
+    <div class="result" id="result">
+      <div class="result-label">link</div>
+      <div class="result-url" id="resultUrl"></div>
+      <button class="copy-btn" id="copyBtn">copy to clipboard</button>
+    </div>
+    
+    <div class="uploads-list">
+      <h2 class="uploads-title">uploads</h2>
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="search uploads..." 
+        class="search-input"
+      >
+      <div id="uploadsList"></div>
+    </div>
+  </div>
+  
+  <script src="/client.js"></script>
+</body>
+</html>
+
