@@ -1,0 +1,13 @@
+{
+  "name": "uploads",
+  "version": "1.0.0",
+  "description": "file archive for yxorp users",
+  "main": "server.js",
+  "dependencies": {
+    "auto-json-db": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+

@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const JsonDB = require('auto-json-db');
 const { generateThemeCSS } = require('./themes');
 
 // Simple MIME type detection
@@ -40,8 +41,6 @@ const PORT = process.env.PORT || 8768;
 const DATA_DIR = process.env.DATA_DIR || './data';
 const THEME = process.env.THEME || 'default';
 const FILES_DIR = path.join(DATA_DIR, 'files');
-const META_FILE = path.join(DATA_DIR, 'uploads.json');
-const PASSWORD_FILE = path.join(DATA_DIR, 'password.txt');
 const MAX_SIZE = process.env.MAX_SIZE || 1024 * 1024 * 1024; // 1GB default
 
 // Ensure data directories exist
@@ -52,24 +51,15 @@ if (!fs.existsSync(FILES_DIR)) {
   fs.mkdirSync(FILES_DIR, { recursive: true });
 }
 
-// Initialize uploads metadata
-let uploads = {};
-if (fs.existsSync(META_FILE)) {
-  try {
-    uploads = JSON.parse(fs.readFileSync(META_FILE, 'utf8'));
-  } catch (e) {
-    console.error('Error loading uploads:', e.message);
-    uploads = {};
-  }
-}
+// Initialize database
+const db = new JsonDB(path.join(DATA_DIR, 'uploads.json'));
 
-let passwordHash = null;
-if (fs.existsSync(PASSWORD_FILE)) {
-  try {
-    passwordHash = fs.readFileSync(PASSWORD_FILE, 'utf8').trim();
-  } catch (e) {
-    console.error('Error loading password file:', e.message);
-  }
+// Initialize db structure if needed
+if (!db.data.passwordHash) {
+  db.data.passwordHash = null;
+}
+if (!db.data.uploads) {
+  db.data.uploads = {};
 }
 
 function hashPassword(password) {
@@ -77,12 +67,8 @@ function hashPassword(password) {
 }
 
 function verifyPassword(password) {
-  if (!passwordHash) return false;
-  return hashPassword(password) === passwordHash;
-}
-
-function saveUploads() {
-  fs.writeFileSync(META_FILE, JSON.stringify(uploads, null, 2));
+  if (!db.data.passwordHash) return false;
+  return hashPassword(password) === db.data.passwordHash;
 }
 
 function generateId(filename) {
@@ -94,7 +80,7 @@ function generateId(filename) {
     for (let i = 0; i < 8; i++) {
       id += chars[Math.floor(Math.random() * chars.length)];
     }
-  } while (uploads[id + ext]);
+  } while (db.data.uploads[id + ext]);
   return id + ext;
 }
 
@@ -111,7 +97,7 @@ function serveFile(filePath, contentType, res) {
 }
 
 function checkAuth(req) {
-  if (!passwordHash) return true;
+  if (!db.data.passwordHash) return true;
   
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -158,8 +144,8 @@ const server = http.createServer((req, res) => {
   if (url.pathname === '/api/auth' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ 
-      needsSetup: !passwordHash,
-      requiresAuth: !!passwordHash,
+      needsSetup: !db.data.passwordHash,
+      requiresAuth: !!db.data.passwordHash,
       authenticated: checkAuth(req)
     }));
     return;
@@ -167,7 +153,7 @@ const server = http.createServer((req, res) => {
   
   // API: Setup password
   if (url.pathname === '/api/setup' && req.method === 'POST') {
-    if (passwordHash) {
+    if (db.data.passwordHash) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Password already set' }));
       return;
@@ -185,8 +171,7 @@ const server = http.createServer((req, res) => {
           return;
         }
         
-        passwordHash = hashPassword(password);
-        fs.writeFileSync(PASSWORD_FILE, passwordHash);
+        db.data.passwordHash = hashPassword(password);
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
@@ -225,17 +210,16 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       writeStream.end();
       
-      uploads[id] = {
+      db.data.uploads[id] = {
         id,
         filename,
         description,
         size: uploadedSize,
         uploaded: new Date().toISOString()
       };
-      saveUploads();
       
       res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ id, upload: uploads[id] }));
+      res.end(JSON.stringify({ id, upload: db.data.uploads[id] }));
     });
     
     req.on('error', (err) => {
@@ -251,7 +235,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === '/api/uploads' && req.method === 'GET') {
     if (!requireAuth(req, res)) return;
     
-    const uploadArray = Object.values(uploads).sort((a, b) => 
+    const uploadArray = Object.values(db.data.uploads).sort((a, b) => 
       new Date(b.uploaded) - new Date(a.uploaded)
     );
     
@@ -265,13 +249,12 @@ const server = http.createServer((req, res) => {
     if (!requireAuth(req, res)) return;
     
     const id = url.pathname.split('/')[3];
-    if (uploads[id]) {
+    if (db.data.uploads[id]) {
       const filePath = path.join(FILES_DIR, id);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
-      delete uploads[id];
-      saveUploads();
+      delete db.data.uploads[id];
       
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true }));
@@ -284,8 +267,8 @@ const server = http.createServer((req, res) => {
   
   // Serve uploaded files at root path (public) - must be last to not conflict with other routes
   const potentialId = url.pathname.slice(1);
-  if (potentialId && uploads[potentialId] && req.method === 'GET') {
-    const upload = uploads[potentialId];
+  if (potentialId && db.data.uploads[potentialId] && req.method === 'GET') {
+    const upload = db.data.uploads[potentialId];
     const filePath = path.join(FILES_DIR, potentialId);
     
     if (!fs.existsSync(filePath)) {
@@ -316,7 +299,7 @@ server.listen(PORT, () => {
   console.log(`📤 uploads running on http://localhost:${PORT}`);
   console.log(`📁 Data stored in ${path.resolve(DATA_DIR)}`);
   console.log(`📏 Max file size: ${(MAX_SIZE / 1024 / 1024).toFixed(0)}MB`);
-  if (passwordHash) {
+  if (db.data.passwordHash) {
     console.log(`🔒 Password required`);
   } else {
     console.log(`⚠️  No password set - first visitor will set password`);
