@@ -1,3 +1,23 @@
+:root {
+  --bg: #fafafa;
+  --text: #000;
+  --text-shadow: none;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --border: #ddd;
+  --border-focus: #000;
+  --button-bg: #000;
+  --button-text: #fff;
+  --button-hover-bg: #333;
+  --button-shadow: none;
+  --secondary-bg: #fff;
+  --secondary-border: #ddd;
+  --secondary-hover-bg: #f5f5f5;
+  --secondary-hover-border: #000;
+  --delete-hover-color: #d00;
+  --error-color: #d00;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,9 +25,9 @@
 }
 
 body {
-  font-family: "Google Sans Code", monospace;
-  background: #fafafa;
-  color: #000;
+  font-family: "Google Sans Code", "Noto Emoji", monospace;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,11 +44,12 @@ h1 {
   font-size: 1.5rem;
   font-weight: 400;
   margin-bottom: 0.25rem;
-  color: #000;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
 }
 
 .subtitle {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
   font-size: 0.875rem;
   font-weight: 300;
@@ -41,9 +62,30 @@ h1 {
 label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #000;
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 400;
+  text-shadow: var(--text-shadow);
+}
+
+.file-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-family: "Google Sans Code", monospace;
+  background: var(--secondary-bg);
+  color: var(--text);
+  border: 1px solid var(--secondary-border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: none;
+  margin-bottom: 0;
+}
+
+.file-label:hover {
+  background: var(--secondary-hover-bg);
+  border-color: var(--secondary-hover-border);
 }
 
 input[type="text"],
@@ -52,21 +94,22 @@ input[type="file"] {
   padding: 0.5rem;
   font-size: 16px;
   font-family: "Google Sans Code", monospace;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  border: 1px solid var(--border);
   border-radius: 2px;
-  color: #000;
-  transition: border-color 0.2s;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input[type="text"]:focus,
 input[type="file"]:focus {
   outline: none;
-  border-color: #000;
+  border-color: var(--border-focus);
+  box-shadow: var(--button-shadow);
 }
 
 input[type="text"]::placeholder {
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .button-group {
@@ -81,17 +124,19 @@ button {
   font-size: 0.875rem;
   font-weight: 400;
   font-family: "Google Sans Code", monospace;
-  background: #000;
-  color: #fff;
-  border: 1px solid #000;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--button-bg);
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.2s;
+  text-shadow: none;
 }
 
 button:hover {
-  background: #333;
-  border-color: #333;
+  background: var(--button-hover-bg);
+  border-color: var(--button-hover-bg);
+  box-shadow: var(--button-shadow);
 }
 
 button:active {
@@ -99,21 +144,21 @@ button:active {
 }
 
 button.secondary {
-  background: #fff;
-  color: #000;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  color: var(--text);
+  border: 1px solid var(--secondary-border);
 }
 
 button.secondary:hover {
-  background: #f5f5f5;
-  border-color: #000;
+  background: var(--secondary-hover-bg);
+  border-color: var(--secondary-hover-border);
 }
 
 .result {
   margin-top: 2rem;
   padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  border: 1px solid var(--border);
   border-radius: 2px;
   display: none;
 }
@@ -123,36 +168,37 @@ button.secondary:hover {
 }
 
 .result-label {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.75rem;
   margin-bottom: 0.5rem;
   font-weight: 400;
 }
 
-.result-url {
+.result-content {
   font-size: 1rem;
-  color: #000;
+  color: var(--text);
   word-break: break-all;
-  font-family: "Google Sans Code", monospace;
   margin-bottom: 1rem;
+  font-family: "Google Sans Code", monospace;
 }
 
 .copy-btn {
   width: 100%;
-  background: #fff;
-  color: #000;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  color: var(--text);
+  border: 1px solid var(--secondary-border);
 }
 
 .copy-btn:hover {
-  background: #f5f5f5;
-  border-color: #000;
+  background: var(--secondary-hover-bg);
+  border-color: var(--secondary-hover-border);
 }
 
 .copy-btn.copied {
-  background: #000;
-  color: #fff;
-  border-color: #000;
+  background: var(--button-bg);
+  color: var(--button-text);
+  text-shadow: none;
+  border-color: var(--button-bg);
 }
 
 .uploads-list {
@@ -162,19 +208,20 @@ button.secondary:hover {
 .uploads-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 0.75rem;
 }
 
 .uploads-title {
   font-size: 1.25rem;
   font-weight: 400;
-  color: #000;
+  color: var(--text);
+  text-shadow: var(--text-shadow);
 }
 
 .storage-info {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .search-input {
@@ -183,8 +230,8 @@ button.secondary:hover {
 
 .upload-item {
   padding: 1rem;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  border: 1px solid var(--border);
   border-radius: 2px;
   margin-bottom: 0.5rem;
 }
@@ -192,30 +239,32 @@ button.secondary:hover {
 .upload-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 0.5rem;
 }
 
 .upload-name {
-  color: #000;
+  color: var(--text);
   font-family: "Google Sans Code", monospace;
   font-size: 0.875rem;
   word-break: break-all;
   font-weight: 500;
   flex: 1;
+  text-shadow: var(--text-shadow);
 }
 
 .upload-actions {
   display: flex;
   gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .upload-btn {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
-  background: #fff;
-  color: #000;
-  border: 1px solid #ddd;
+  background: var(--secondary-bg);
+  color: var(--text);
+  border: 1px solid var(--secondary-border);
   border-radius: 2px;
   cursor: pointer;
   font-family: "Google Sans Code", monospace;
@@ -224,32 +273,33 @@ button.secondary:hover {
 }
 
 .upload-btn:hover {
-  background: #f5f5f5;
-  border-color: #000;
+  background: var(--secondary-hover-bg);
+  border-color: var(--secondary-hover-border);
 }
 
 .upload-btn.delete:hover {
-  background: #fff;
-  border-color: #d00;
-  color: #d00;
+  background: var(--secondary-bg);
+  border-color: var(--delete-hover-color);
+  color: var(--delete-hover-color);
+  text-shadow: none;
 }
 
 .upload-description {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
-  word-break: break-word;
+  word-break: break-all;
 }
 
 .upload-meta {
   display: flex;
   gap: 1rem;
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .error {
-  color: #d00;
+  color: var(--error-color);
   font-size: 0.875rem;
   margin-top: 0.5rem;
   display: none;
@@ -261,8 +311,7 @@ button.secondary:hover {
 
 .empty-state {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 2rem;
   font-size: 0.875rem;
 }
-

@@ -42,9 +42,12 @@ pm2 save
 ## configuration
 
 ```bash
-PORT=8768 node server.js                # custom port (default: 8768)
-DATA_DIR=~/uploads node server.js       # custom data location (default: ./data)
-MAX_SIZE=2147483648 node server.js      # max file size in bytes (default: 1GB)
+PORT=8768 node server.js                    # custom port (default: 8768)
+DATA_DIR=~/uploads node server.js           # custom data location (default: ./data)
+MAX_SIZE=2147483648 node server.js          # max file size in bytes (default: 1GB)
+THEME=beyondcool PORT=8768 node server.js   # use beyondcool theme (orange on black with glow)
+THEME=warm PORT=8768 node server.js         # use warm theme (cream background, brown text)
+THEME=hue120 PORT=8768 node server.js       # use hue-based theme (0-360, e.g. 120=green, 240=blue)
 ```
 
 ---

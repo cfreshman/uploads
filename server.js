@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { generateThemeCSS } = require('./themes');
 
 // Simple MIME type detection
 function getMimeType(filename) {
@@ -37,6 +38,7 @@ function getMimeType(filename) {
 
 const PORT = process.env.PORT || 8768;
 const DATA_DIR = process.env.DATA_DIR || './data';
+const THEME = process.env.THEME || 'default';
 const FILES_DIR = path.join(DATA_DIR, 'files');
 const META_FILE = path.join(DATA_DIR, 'uploads.json');
 const PASSWORD_FILE = path.join(DATA_DIR, 'password.txt');
@@ -127,7 +129,11 @@ const server = http.createServer((req, res) => {
   
   // Serve static files
   if (url.pathname === '/' && req.method === 'GET') {
-    serveFile('index.html', 'text/html', res);
+    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    const themeVars = generateThemeCSS(THEME);
+    const injectedHtml = html.replace('<style id="theme-vars"></style>', `<style id="theme-vars">${themeVars}</style>`);
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(injectedHtml);
     return;
   }
   

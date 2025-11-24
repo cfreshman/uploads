@@ -2,10 +2,13 @@ const form = document.getElementById('uploadForm');
 const result = document.getElementById('result');
 const resultUrl = document.getElementById('resultUrl');
 const copyBtn = document.getElementById('copyBtn');
+const clearBtn = document.getElementById('clearBtn');
 const error = document.getElementById('error');
 const uploadsList = document.getElementById('uploadsList');
 const searchInput = document.getElementById('searchInput');
 const storageInfo = document.getElementById('storageInfo');
+const fileInput = document.getElementById('file');
+const fileLabel = document.getElementById('fileLabel');
 
 let allUploads = [];
 let authToken = localStorage.getItem('uploads_auth') || null;
@@ -277,6 +280,22 @@ copyBtn.addEventListener('click', () => {
 });
 
 searchInput.addEventListener('input', filterUploads);
+
+// Update file label when file is selected
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) {
+    fileLabel.textContent = fileInput.files[0].name;
+  } else {
+    fileLabel.textContent = 'choose file';
+  }
+});
+
+// Clear form
+clearBtn.addEventListener('click', () => {
+  form.reset();
+  fileLabel.textContent = 'choose file';
+  result.classList.remove('show');
+});
 
 checkAuth().then(() => loadUploads());
 
