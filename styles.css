@@ -159,11 +159,22 @@ button.secondary:hover {
   margin-top: 3rem;
 }
 
+.uploads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
 .uploads-title {
   font-size: 1.25rem;
   font-weight: 400;
-  margin-bottom: 0.75rem;
   color: #000;
+}
+
+.storage-info {
+  font-size: 0.75rem;
+  color: #999;
 }
 
 .search-input {

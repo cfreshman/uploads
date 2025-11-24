@@ -5,6 +5,7 @@ const copyBtn = document.getElementById('copyBtn');
 const error = document.getElementById('error');
 const uploadsList = document.getElementById('uploadsList');
 const searchInput = document.getElementById('searchInput');
+const storageInfo = document.getElementById('storageInfo');
 
 let allUploads = [];
 let authToken = localStorage.getItem('uploads_auth') || null;
@@ -243,6 +244,11 @@ async function loadUploads() {
     
     const data = await res.json();
     allUploads = data.uploads || [];
+    
+    // Update storage info
+    const totalBytes = allUploads.reduce((sum, upload) => sum + upload.size, 0);
+    storageInfo.textContent = `${formatBytes(totalBytes)} used`;
+    
     filterUploads();
   } catch (err) {
     console.error('Failed to load uploads:', err);
